@@ -1,0 +1,90 @@
+public function home()
+{
+    session_start();
+    if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == '1') {
+        $assets = "active-class";
+        $itemsPerPage = 1;
+        $currentPage = isset($_GET['page']) ? max(1, $_GET['page']) : 1;
+        $option['condition'] = ''; // Initialize $option['condition']
+
+        if (isset($_REQUEST['delete'])) {
+            // ... existing delete code ...
+
+            $offset = ($currentPage - 1) * $itemsPerPage;
+            $limit = $itemsPerPage;
+            $option['condition'] = "LIMIT $offset, $limit";
+        }
+
+        if (isset($_REQUEST['assign'])) {
+            // ... existing assign code ...
+
+            $offset = ($currentPage - 1) * $itemsPerPage;
+            $limit = $itemsPerPage;
+            $option['condition'] = "LIMIT $offset, $limit";
+
+            $totalItems = App::get('database')->count('products', $option['condition']);
+        }   
+
+        if (isset($_REQUEST['addassets'])) {
+            // ... existing addassets code ...
+
+            $totalItems = App::get('database')->count('products', $option1['condition']);
+        }
+
+        $totalPages = ceil($totalItems / $itemsPerPage);
+
+        // Step 6: Pass pagination information to the view
+        $paginationData = [
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
+        ];
+
+        $option1 = [
+            'columns' => null,
+            'contain' => null,
+            'condition' => null
+        ];
+        $category = App::get('database')->select('categories', $option1);
+        $users = App::get('database')->select('users', $option1);
+        $option = [
+            'columns' => array('products.id', 'product_name', 'category_name', 'user_id', 'fname', 'lname'),
+            'contain' => array(
+                'join1' => array('INNER JOIN', 'categories', 'ON category_id = categories.id'),
+                'join2' => array('LEFT JOIN', 'users', 'ON user_id = users.id'),
+            ),
+            'condition' => $option['condition'] // Add the condition for pagination
+        ];
+        $statement = App::get('database')->select('products', $option);
+        require_once "./App/views/assets.view.php";
+    } else {
+        header('location: /FINALTASKPHP/login');
+    }
+}
+
+
+
+
+
+
+
+
+
+<!-- Pagination -->
+<div class="pagination">
+    <?php if ($currentPage > 1): ?>
+        <a href="?page=<?php echo $currentPage - 1; ?>">Previous</a>
+    <?php endif; ?>
+
+    <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+        <?php if ($page == $currentPage): ?>
+            <span class="current-page"><?php echo $page; ?></span>
+        <?php else: ?>
+            <a href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+        <?php endif; ?>
+    <?php endfor; ?>
+
+    <?php if ($currentPage < $totalPages): ?>
+        <a href="?page=<?php echo $currentPage + 1; ?>">Next</a>
+    <?php endif; ?>
+</div>
+<!-- End Pagination -->
