@@ -1,5 +1,7 @@
 <?php
 
+//----------------------------------- delete record with the help of ajax ------------------
+
 if (isset($_REQUEST['product_id'])) {
     $output = '
     <div class="w-full h-full flex items-center justify-center">

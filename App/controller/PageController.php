@@ -1,29 +1,32 @@
 <?php
-
+session_start();
 use core\App;
 
 class PageController
 {
+    // ------------------ logout ------------------- 
     public function logout()
     {
-        session_start();
         if (isset($_REQUEST['logout'])) {
             session_destroy();
             header('location: /FINALTASKPHP/login');
         }
     }
+
+    //-------------------- employee page -------------------
     public function employee()
     {
-        session_start();
         if (isset($_SESSION['role_id']) && $_SESSION['role_id'] != 1) {
             require_once "./App/views/employee.view.php";
         } else {
             header('location: /FINALTASKPHP/login');
         }
     }
+
+    //------------------- admin assets page ------------------------
     public function home()
     {
-        session_start();
+        //------------ check the login person details ----------------------
         if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == '1') {
             $assets = "active-class";
             if (isset($_REQUEST['delete'])) {
@@ -32,12 +35,14 @@ class PageController
                 $id['product_id'] = null;
                 App::get('database')->update('users', $id, 'product_id', $_REQUEST['delete']);
             }
+            
+            //--------------- assign assets ----------------------
 
             if (isset($_REQUEST['assign'])) {
 
                 $product['user_id'] = $_REQUEST['user_id'];
                 $user['product_id'] = $_REQUEST['assign'];
-                // $pro['user_id'] = $_REQUEST['user_id'];
+
                 if ($_REQUEST['user_id'] == 'null') {
                     $user['product_id'] = 'null';
                     $product['user_id'] = 'null';
@@ -50,6 +55,7 @@ class PageController
                         'condition' => null
                     ];
                     $p = App::get('database')->select('products', $option1);
+
                     for ($i = 0; $i < count($p); $i++) {
                         if ($p[$i]['user_id'] == $_REQUEST['user_id']) {
                             $count = 1;
@@ -65,6 +71,7 @@ class PageController
                 }
             }
 
+            //-------------------- add asstes ------------------------
             if (isset($_REQUEST['addassets'])) {
                 foreach ($_REQUEST as $key => $value) {
                     $_REQUEST[$key] = trim($value);
@@ -108,7 +115,9 @@ class PageController
                     }
                 }
             }
-            e:
+
+            e:   // goto statement exopnent
+
             // $entries = $_REQUEST['entries'];
             $option1 = [
                 'columns' => null,
@@ -126,6 +135,9 @@ class PageController
                 'condition' => null
             ];
             $statement = App::get('database')->select('products', $option);
+
+            // ------------------------ pagination ------------------
+
             if (isset($_REQUEST['entries']) || isset($_REQUEST['page'])) {
                 if (isset($_REQUEST['entries'])) {
                     $_SESSION['entries'] = $_REQUEST['entries'];
@@ -154,9 +166,11 @@ class PageController
             header('location: /FINALTASKPHP/login');
         }
     }
+
+    //---------------------- categories page ----------------------
     public function category()
     {
-        session_start();
+        //--------------------- check the login details ---------------------
         if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == '1') {
             $category = "active-class";
             if (isset($_REQUEST['addcategory'])) {
@@ -170,9 +184,10 @@ class PageController
                 ),
                 'condition' => null
             ];
-            // $data = App::get('database')->select('categories', $option);
-            // $arr = array_keys($data[0]);
+
             $statement = App::get('database')->select('categories', $option);
+
+            //-------------------- pagination ----------------------
             if (isset($_REQUEST['entries']) || isset($_REQUEST['page'])) {
                 if (isset($_REQUEST['entries'])) {
                     $_SESSION['entries'] = $_REQUEST['entries'];
@@ -201,11 +216,14 @@ class PageController
         }
     }
 
+    //-------------------- users page -------------------------
     public function user()
     {
-        session_start();
+        //------------------- check the login details ----------------------------
         if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == '1') {
             $user = "active-class";
+
+            //------------------- delete user ------------------
             if (isset($_REQUEST['delete'])) {
                 $id['user_id'] = $_REQUEST['delete'];
                 App::get('database')->delete('users', 'id', $_REQUEST['delete']);
@@ -213,6 +231,7 @@ class PageController
                 App::get('database')->update('products', $id, 'user_id', $_REQUEST['delete']);
             }
 
+            //-------------------- add user -----------------------
             if (isset($_REQUEST['adduser'])) {
                 foreach ($_REQUEST as $key => $value) {
                     $_REQUEST[$key] = trim($value);
@@ -225,8 +244,8 @@ class PageController
                 App::get('database')->insert('users', $_REQUEST);
             }
 
-            e:
-            // $entries = $_REQUEST['entries'];
+            e: //goto statement
+
             $option1 = [
                 'columns' => null,
                 'contain' => null,
@@ -244,6 +263,8 @@ class PageController
                 'condition' => null
             ];
             $statement = App::get('database')->select('users', $option);
+
+            //------------------------ pagination ----------------------
             if (isset($_REQUEST['entries']) || isset($_REQUEST['page'])) {
                 if (isset($_REQUEST['entries'])) {
                     $_SESSION['entries'] = $_REQUEST['entries'];
@@ -272,6 +293,8 @@ class PageController
             header('location: /FINALTASKPHP/login');
         }
     }
+
+    //-------------------------- login page -----------------------
     public function login()
     {
         if (isset($_REQUEST['login'])) {
@@ -288,6 +311,8 @@ class PageController
                 'condition' => array('username' => $_REQUEST['username'], 'password' => $_REQUEST['password'])
             ];
             $user = App::get('database')->select('users', $option1);
+
+            // ----------------------- fetch data from database to check and match the details with login data -----------------------
             if (count($user) > 0) {
                 session_start();
                 $_SESSION = $user[0];
@@ -303,6 +328,8 @@ class PageController
         e:
         require_once "./App/views/login.view.php";
     }
+
+    // ---------------------- page not found -------------------
     public function error_404()
     {
         require_once "./App/views/404.php";

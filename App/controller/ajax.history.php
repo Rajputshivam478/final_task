@@ -1,4 +1,6 @@
 <?php
+
+// -------------------------- show history data with the help of ajax ----------------------
 use core\App;
 
 if (isset($_REQUEST['id'])) {

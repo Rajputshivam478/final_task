@@ -1,5 +1,6 @@
 <?php
 
+// ----------------------- search data with the help of ajax -----------------------
 use core\App;
 use core\database\QueryBuilder;
 

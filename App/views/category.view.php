@@ -1,3 +1,4 @@
+<!-- ------------------------- categories page ----------------------- -->
 <!DOCTYPE html>
 <html lang="en">
 

@@ -1,4 +1,6 @@
 <?php
+
+// ------------------- update data with help of ajax --------------------- 
 use core\App;
 
 $_REQUEST['id'];
